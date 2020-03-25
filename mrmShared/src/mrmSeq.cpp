@@ -20,22 +20,29 @@
 
 #include <epicsExport.h>
 
-#define  EVG_SEQ_RAM_RUNNING    0x02000000  /* Sequence RAM is Running (read only) */
-#define  EVG_SEQ_RAM_ENABLED    0x01000000  /* Sequence RAM is Enabled (read only) */
+#define  EVG_SEQ_RAM_RUNNING        0x02000000  /* Sequence RAM is Running (read only) */
+#define  EVG_SEQ_RAM_ENABLED        0x01000000  /* Sequence RAM is Enabled (read only) */
 
 //TODO: external enable/trigger bits and hanlding?
-#define  EVG_SEQ_RAM_SW_TRIG    0x00200000  /* Sequence RAM Software Trigger Bit */
-#define  EVG_SEQ_RAM_RESET      0x00040000  /* Sequence RAM Reset */
-#define  EVG_SEQ_RAM_DISABLE    0x00020000  /* Sequence RAM Disable (and stop) */
-#define  EVG_SEQ_RAM_ARM        0x00010000  /* Sequence RAM Enable/Arm */
+#define  EVG_SEQ_RAM_SW_TRIG        0x00200000  /* Sequence RAM Software Trigger Bit */
+#define  EVG_SEQ_RAM_RESET          0x00040000  /* Sequence RAM Reset */
+#define  EVG_SEQ_RAM_DISABLE        0x00020000  /* Sequence RAM Disable (and stop) */
+#define  EVG_SEQ_RAM_ARM            0x00010000  /* Sequence RAM Enable/Arm */
 
-#define  EVG_SEQ_RAM_WRITABLE_MASK 0x00ffffff
-#define  EVG_SEQ_RAM_REPEAT_MASK 0x00180000 /* Sequence RAM Repeat Mode Mask */
-#define  EVG_SEQ_RAM_NORMAL     0x00000000  /* Normal Mode: Repeat every trigger */
-#define  EVG_SEQ_RAM_SINGLE     0x00100000  /* Single-Shot Mode: Disable on completion */
-#define  EVG_SEQ_RAM_RECYCLE    0x00080000  /* Continuous Mode: Repeat on completion */
+//Mask registers
+#define  EVG_SEQ_RAM_SWMASK         0x0000F000  // Sequence RAM Software mask
+#define  EVG_SEQ_RAM_SWMASK_shift   12
+#define  EVG_SEQ_RAM_SWENABLE       0x00000F00  // Sequence RAM Software enable
+#define  EVG_SEQ_RAM_SWENABLE_shift 8
 
-#define  EVG_SEQ_RAM_SRC_MASK 0x000000ff
+#define  EVG_SEQ_RAM_WRITABLE_MASK  0x00ffffff
+
+#define  EVG_SEQ_RAM_REPEAT_MASK    0x00180000 /* Sequence RAM Repeat Mode Mask */
+#define  EVG_SEQ_RAM_NORMAL         0x00000000  /* Normal Mode: Repeat every trigger */
+#define  EVG_SEQ_RAM_SINGLE         0x00100000  /* Single-Shot Mode: Disable on completion */
+#define  EVG_SEQ_RAM_RECYCLE        0x00080000  /* Continuous Mode: Repeat on completion */
+
+#define  EVG_SEQ_RAM_SRC_MASK       0x000000ff
 
 #if defined(__rtems__)
 #  define DEBUG(LVL, ARGS) do{if(SeqManagerDebug>=(LVL)) {printk ARGS ;}}while(0)
@@ -242,6 +249,33 @@ public:
         return ret;
     }
 
+
+    void setMask(const epicsUInt8* arr, epicsUInt32 count)
+    {
+        masks_t masks(count);
+        std::copy(arr,
+                  arr+count,
+                  masks.begin());
+        {
+            SCOPED_LOCK(mutex);
+            scratch.masks.swap(masks);
+            is_committed = false;
+        }
+        DEBUG(4, ("Set masks\n"));
+        scanIoRequest(changed);
+    }
+
+    epicsUInt32 getMask(epicsUInt8* arr, epicsUInt32 count) const
+    {
+        SCOPED_LOCK(mutex);
+        epicsUInt32 ret = std::min(size_t(count), committed.masks.size());
+        std::copy(committed.masks.begin(),
+                  committed.masks.begin()+ret,
+                  arr);
+        return ret;
+    }
+
+
     void setTrigSrc(epicsUInt32 src)
     {
         DEBUG(4, ("Setting trig src %x\n", (unsigned)src));
@@ -320,10 +354,12 @@ public:
 
     typedef std::vector<epicsUInt64> times_t;
     typedef std::vector<epicsUInt8> codes_t;
+    typedef std::vector<epicsUInt8> masks_t;
 
     struct Config {
         times_t times;
         codes_t codes;
+        codes_t masks;
         RunMode mode;
         epicsUInt32 src;
         Config()
@@ -334,6 +370,7 @@ public:
         {
             std::swap(times, o.times);
             std::swap(codes, o.codes);
+            std::swap(masks, o.masks);
             std::swap(mode, o.mode);
             std::swap(src, o.src);
         }
@@ -377,6 +414,8 @@ OBJECT_BEGIN(SoftSequence)
   OBJECT_PROP1("TIMES", &SoftSequence::stateChange);
   OBJECT_PROP2("CODES", &SoftSequence::getEventCode, &SoftSequence::setEventCode);
   OBJECT_PROP1("CODES", &SoftSequence::stateChange);
+  OBJECT_PROP2("MASK", &SoftSequence::getEventCode, &SoftSequence::setMask);
+  OBJECT_PROP1("MASK", &SoftSequence::stateChange);
   OBJECT_PROP1("NUM_RUNS", &SoftSequence::counterEnd);
   OBJECT_PROP1("NUM_RUNS", &SoftSequence::counterEndScan);
   OBJECT_PROP1("NUM_STARTS", &SoftSequence::counterStart);
@@ -534,6 +573,8 @@ void SoftSequence::commit()
     DEBUG(1, ("Committed\n") );
 }
 
+
+
 void SoftSequence::enable()
 {
     SCOPED_LOCK(mutex);
@@ -569,6 +610,18 @@ void SoftSequence::disable()
     scanIoRequest(changed);
     DEBUG(1, ("Disabled\n") );
 }
+
+    /* From sequence ram control register */
+// Always reading/writing from/to sequence 1 register, since mask and enable values are common for all RAMs
+// void SoftSequence::setSWSequenceMask(epicsUInt16 mask){
+//     epicsUInt32 val = READ32(m_pReg, SeqControl_base);
+
+//     mask &= 0xF;   // mask is a 4 bit value
+//     val &= ~EVG_SEQ_RAM_SWMASK;
+//     val |= mask << EVG_SEQ_RAM_SWMASK_shift;
+
+//     WRITE32(m_pReg, SeqControl_base, val);
+// }
 
 // Called from ISR context
 void SoftSequence::sync()
@@ -654,16 +707,35 @@ void SoftSequence::sync()
         DEBUG(0, ("unknown sequencer trigger code %08x\n", (unsigned)committed.src));
         break;
     }
-    DEBUG(5, ("  Trig Src %x\n", src));
+    DEBUG(5, ("-  Trig Src %x\n", src));
 
     hw->ctrlreg_user |= src;
 
     // write out the RAM
     volatile epicsUInt32 *ram = static_cast<volatile epicsUInt32 *>(hw->rambase);
     for(size_t i=0, N=committed.codes.size(); i<N; i++)
-    {
+    { 
+         epicsUInt32 codesMasks;
+
+         DEBUG(5, ("  Code %u\n", committed.codes[i]));
+         if (committed.masks.size()>i){
+            if (committed.masks[i]==1){
+                DEBUG(5, ("  masked\n", src));
+
+                codesMasks=committed.codes[i]+0x100;
+
+            }else {
+                codesMasks=committed.codes[i];
+                DEBUG(5, ("  Not masked\n", src));
+            }
+         }else{
+                codesMasks=committed.codes[i];
+                DEBUG(5, ("  Not masked\n", src));
+         }
+        //  
+         DEBUG(5, ("  Done, write %u\n",codesMasks));
         nat_iowrite32(ram++, committed.times[i]);
-        nat_iowrite32(ram++, committed.codes[i]);
+        nat_iowrite32(ram++, codesMasks);
         if(committed.codes[i]==0x7f)
             break;
     }

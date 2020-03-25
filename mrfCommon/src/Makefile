@@ -1,4 +1,4 @@
-TOP=../..
+TOP=../../..
 include $(TOP)/configure/CONFIG
 
 USR_CFLAGS += -DDEBUG_PRINT
@@ -23,6 +23,8 @@ INC += mrf/object.h
 
 INC += mrf/version.h
 
+INC += mrf/spi.h
+INC += mrf/pollirq.h
 INC += devObj.h
 
 INC += configurationInfo.h

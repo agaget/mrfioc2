@@ -1,4 +1,4 @@
-TOP=../..
+TOP=../../..
 include $(TOP)/configure/CONFIG
 #----------------------------------------
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
@@ -6,19 +6,24 @@ include $(TOP)/configure/CONFIG
 USR_DBFLAGS += -I$(TOP)/mrmShared/Db
 
 DB += mrmevrout.db
+DB += mrmevroutint.db
 DB += mrmevrbase.template
 DB += mrmevrdc.template
 DB += mrmevrbufrx.db
 DB += sequencedemo.db
 DB += mrmevrdlymodule.template
+DB += evrSoftSeq.template
+DB += evrSoftEvt.template
+DB += evrdcpulser.template
 
-DB += evr-pmc-230.db
-DB += evr-cpci-230.db
-DB += evr-cpci-300.db
-DB += evr-vmerf-230.db
+# DB += evr-pmc-230.db
+# DB += evr-cpci-230.db
+# DB += evr-cpci-300.db
+# DB += evr-vmerf-230.db
 DB += evr-tg-300.db
-DB += evr-mtca-300.db
-DB += evr-pcie-300dc.db
+# DB += evr-mtca-300.db
+# DB += evr-mtca-300u.db
+# DB += evr-pcie-300dc.db
 
 ifneq ($(DEVIOCSTATS),)
 DB_INSTALLS += $(DEVIOCSTATS)/db/iocAdminRTEMS.db

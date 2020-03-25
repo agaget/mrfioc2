@@ -1,5 +1,5 @@
 
-TOP=../..
+TOP=../../..
 include $(TOP)/configure/CONFIG
 
 USR_INCLUDES += -I$(TOP)/mrfCommon/src
@@ -10,6 +10,8 @@ INC += mrmSeq.h
 INC += mrmpci.h
 INC += sfp.h
 
+INC += mrmtimesrc.h
+INC += mrmspi.h
 DBD += mrmShared.dbd
 
 LIBRARY_IOC += mrmShared

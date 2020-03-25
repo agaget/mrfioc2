@@ -1,4 +1,4 @@
-TOP=../..
+TOP=../../..
 
 include $(TOP)/configure/CONFIG
 #----------------------------------------
@@ -26,8 +26,6 @@ mrf_DBD += epicspci.dbd
 # Add all the support libraries needed by this IOC
 mrf_LIBS += evgmrm evrMrm evr mrmShared mrfCommon epicspci epicsvme
 
-mrf_DBD += evrFRIBSupport.dbd
-mrf_LIBS += evrFRIB
 
 # mrf_registerRecordDeviceDriver.cpp derives from mrf.dbd
 mrf_SRCS += mrf_registerRecordDeviceDriver.cpp

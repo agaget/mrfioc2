@@ -1,4 +1,4 @@
-TOP=../..
+TOP=../../..
 
 include $(TOP)/configure/CONFIG
 #----------------------------------------
@@ -8,6 +8,9 @@ include $(TOP)/configure/CONFIG
 USR_INCLUDES += -I$(TOP)/mrmShared/src
 USR_INCLUDES += -I$(TOP)/mrfCommon/src
 USR_INCLUDES += -I$(TOP)/evrMrmApp/src
+USR_INCLUDES += -I../../../mrmShared/src
+USR_INCLUDES += -I../../../mrfCommon/src
+USR_INCLUDES += -I../../../evrMrmApp/src
 
 LIBRARY_IOC += evgmrm
 
