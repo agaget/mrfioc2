@@ -257,4 +257,8 @@ file "evrin.db"
 {IN, INTRIG, INCODE, OBJ, DESC}
 {"$(SYS){$(D)-In:0}", "$(SYS){$(D)-In:0}Trig:", "$(SYS){$(D)-In:0}Code:", "$(EVR):FPIn0", "IN0 (TTL)"}
 {"$(SYS){$(D)-In:1}", "$(SYS){$(D)-In:1}Trig:", "$(SYS){$(D)-In:1}Code:", "$(EVR):FPIn1", "IN1 (TTL)"}
+{"$(SYS){$(D)-Univ:0}", "$(SYS){$(D)-In:1}Trig:", "$(SYS){$(D)-In:1}Code:", "$(EVR):FPUniv0", "Univ0 (TTL)"}
+{"$(SYS){$(D)-Univ:1}", "$(SYS){$(D)-In:1}Trig:", "$(SYS){$(D)-In:1}Code:", "$(EVR):FPUniv1", "Univ1 (TTL)"}
+{"$(SYS){$(D)-Univ:2}", "$(SYS){$(D)-In:1}Trig:", "$(SYS){$(D)-In:1}Code:", "$(EVR):FPUniv2", "Univ2 (TTL)"}
+{"$(SYS){$(D)-Univ:3}", "$(SYS){$(D)-In:1}Trig:", "$(SYS){$(D)-In:1}Code:", "$(EVR):FPUniv3", "Univ3 (TTL)"}
 }
