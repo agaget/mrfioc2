@@ -409,7 +409,7 @@ mrmEvgSetupPCI (
         bus.busType = busType_pci;
         bus.pci.dev = cur;
 
-        printf("Device %s  %x:%x.%x\n", id, cur->bus, cur->device,
+        printf("#############\n##### Device %s  %x:%x.%x\n#############\n", id, cur->bus, cur->device,
                cur->function);
         printf("Using IRQ %u\n", cur->irq);
 
