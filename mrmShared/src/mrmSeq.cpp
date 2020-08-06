@@ -558,6 +558,7 @@ epicsUInt32 SoftSequence::getSwMask() const
         return val;
     }
 }
+
 void SoftSequence::setSwMask(epicsUInt32 src)
 {
 
@@ -924,29 +925,10 @@ void SoftSequence::sync()
         epicsUInt32 codesMasks;
 
         DEBUG(5, ("  Code %u\n", committed.codes[i]));
-        // if (committed.masks.size() > i)
-        // {
-        //     if (committed.masks[i] == 1)
-        //     {
-        //         DEBUG(5, ("  masked\n", src));
-
-        //         codesMasks = committed.codes[i] + 0x100;
-        //     }
-        //     else
-        //     {
-        //         codesMasks = committed.codes[i];
-        //         DEBUG(5, ("  Not masked\n", src));
-        //     }
-        // }
-        // else
-        // {
-        //     codesMasks = committed.codes[i];
-        //     DEBUG(5, ("  Not masked\n", src));
-        // }
 
         codesMasks = committed.codes[i];
-        codesMasks |= committed.enables[i] << 8;
-        codesMasks |= committed.masks[i] << 12;
+        codesMasks |= committed.enables[i] << EVG_SEQ_RAM_SWENABLE_shift;
+        codesMasks |= committed.masks[i] << EVG_SEQ_RAM_SWMASK_shift;
 
         //
         DEBUG(5, ("  Done, write %u\n", codesMasks));
