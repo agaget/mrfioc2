@@ -281,6 +281,10 @@
 /**************************************************************************************************/
 
 #define  EVG_EXT_INP_IRQ_ENA    0x01000000
+#define  EVG_INP_FP_ENA    0x0F000000
+#define  EVG_INP_FP_ENA_shift   24 
+#define  EVG_INP_FP_MASK    0xF0000000
+#define  EVG_INP_FP_MASK_shift   28
 
 #ifndef  EVG_CONSTANTS
 #define  EVG_CONSTANTS
