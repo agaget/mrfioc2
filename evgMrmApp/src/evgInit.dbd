@@ -1,6 +1,7 @@
 registrar(evgMrmRegistrar)
 driver(drvEvgMrm)
 include "mrmShared.dbd"
+include "devlib2.dbd"
 
 #evgTrigEvt.db
 device( bo, VME_IO, devBoEvgTrigEvtMxc, "EVG Trig Evt Mxc")
