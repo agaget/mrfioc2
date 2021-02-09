@@ -71,7 +71,7 @@ pattern { P, OBJ }
 { "$(SYS){$(D)-Out:Front3}", "$(EVG):FrontOut3" }
 }
 
-file mrmSoftSeq.template {
+file mrmSoftSeq.db {
 pattern { P, PINITSEQ, PTRIGSRC, EVG, seqNum, NELM }
 { "$(SYS){$(D)-SoftSeq:0}", "$(SYS){$(D)-SoftSeq:0}InitSeq:", "$(SYS){$(D)-SoftSeq:0}TrigSrc:", "$(EVG)", 0, 2047 }
 { "$(SYS){$(D)-SoftSeq:1}", "$(SYS){$(D)-SoftSeq:1}InitSeq:", "$(SYS){$(D)-SoftSeq:1}TrigSrc:", "$(EVG)", 1, 2047 }
