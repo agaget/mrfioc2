@@ -48,12 +48,14 @@ MRMPulser::enabled() const
 void
 MRMPulser::enable(bool s)
 {
-    if(s)
+    if(s){
         BITSET(NAT,32,owner.base, PulserCtrl(id),
              PulserCtrl_ena|PulserCtrl_mtrg|PulserCtrl_mset|PulserCtrl_mrst);
-    else
+    }
+    else{
         BITCLR(NAT,32,owner.base, PulserCtrl(id),
              PulserCtrl_ena|PulserCtrl_mtrg|PulserCtrl_mset|PulserCtrl_mrst);
+    }
 }
 
 void
