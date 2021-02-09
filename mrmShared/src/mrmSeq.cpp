@@ -731,6 +731,10 @@ void SoftSequence::commit()
             conf.times.push_back(0);
         else
             conf.times.push_back(conf.times.back() + 1);
+
+        conf.masks.push_back(0);
+        conf.enables.push_back(0);
+
     }
 
     if (conf.times.size() > 2048)
